@@ -11,7 +11,9 @@ import com.google.api.client.util.StringUtils;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
-import com.google.api.services.gmail.model.*;
+import com.google.api.services.gmail.model.ListMessagesResponse;
+import com.google.api.services.gmail.model.Message;
+import com.google.api.services.gmail.model.MessagePart;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.*;
@@ -21,8 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GmailServiceActions {
-    private static final String user = "user";
-    private final String APPLICATION_NAME = "application_name";
+    private final String APPLICATION_NAME = " Test ";
     private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private String TOKENS_DIRECTORY_PATH;
     private List<String> SCOPES = Arrays.asList(GmailScopes.MAIL_GOOGLE_COM);
@@ -43,7 +44,6 @@ public class GmailServiceActions {
     }
 
     private Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
-
         InputStream in = new FileInputStream(CREDENTIALS_FILE_PATH);
         if (in == null) {
             throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
@@ -65,13 +65,12 @@ public class GmailServiceActions {
             Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                     .setApplicationName(APPLICATION_NAME)
                     .build();
-            ListMessagesResponse response =
-                    service.
-                            users().
-                            messages().
-                            list("me").
-                            setQ("from:" + "automat@nazwa.pl").
-                            execute();
+
+            ListMessagesResponse response = service.users().messages()
+                    .list("me")
+                    .setQ("from:" + "automat@nazwa.pl")
+                    .execute();
+
             String messageid = response.getMessages().get(0).getId();
             Message message = service.users().messages().get("me", messageid).execute();
 
